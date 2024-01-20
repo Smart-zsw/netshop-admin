@@ -3,13 +3,17 @@
     <!-- 搜索表单 -->
     <el-form label-width="70px" size="small">
       <el-form-item label="角色名称">
-        <el-input style="width: 100%" placeholder="角色名称"></el-input>
+        <el-input
+          v-model="queryDto.roleName"
+          style="width: 100%"
+          placeholder="角色名称"
+        ></el-input>
       </el-form-item>
-      <el-row style="display:flex">
-        <el-button type="primary" size="small">
+      <el-row style="display: flex">
+        <el-button type="primary" size="small" @click="searchSysRole">
           搜索
         </el-button>
-        <el-button size="small">重置</el-button>
+        <el-button size="small" @click="resetData">重置</el-button>
       </el-row>
     </el-form>
 
@@ -35,34 +39,56 @@
 
     <!--分页条-->
     <el-pagination
-      :page-sizes="[10, 20, 50, 100]"
-      layout="total, sizes, prev, pager, next"
+      v-model:current-page="pageParams.page"
+      v-model:page-size="pageParams.limit"
+      :page-size="[10, 20, 50, 100]"
+      @size-change="fetchData"
+      @current-change="fetchData"
+      layout="total,sizes,prev,pager,next"
       :total="total"
     />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { GetSysRoleListByPage } from '@/api/sysRole'
 
-// 分页条总记录数
-let total = ref(0)
+//定义数据模型
+let list = ref([]) //角色列表
 
-// 定义表格数据模型
-let list = ref([
-  {
-    id: 9,
-    roleName: '系统管理员',
-    roleCode: 'xtgly',
-    createTime: '2023-07-31',
-  },
-  {
-    id: 10,
-    roleName: '商品管理员',
-    roleCode: 'spgly',
-    createTime: '2023-07-31',
-  },
-])
+let total = ref(0) //总记录数
+
+//分页数据
+const pageParamsForm = {
+  page: 1, //当前页
+  limit: 3, //每页记录数
+}
+const pageParams = ref(pageParamsForm)
+
+const queryDto = ref({ rolrName: '' }) //条件封装数据
+
+//钩子函数
+onMounted(() => {
+  fetchData()
+})
+
+//操作方法：列表方法和搜索方法
+//列表方法：axios请求调用接口得到列表数据
+const fetchData = async () => {
+  const { data, code, message } = await GetSysRoleListByPage(
+    pageParams.value.page,
+    pageParams.value.limit,
+    queryDto.value
+  )
+  list.value = data.list
+  total.value = data.total
+}
+
+//搜索方法
+const searchSysRole = () => {
+  fetchData()
+}
 </script>
 
 <style scoped>
