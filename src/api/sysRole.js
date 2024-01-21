@@ -13,3 +13,13 @@ export const GetSysRoleListByPage = (current, limit, queryDto) => {
     data: queryDto, //其他参数
   })
 }
+
+//角色添加
+export const SaveSysRole = sysRole => {
+  return request({
+    //``模板字符串
+    url: `${base_api}/saveSysRole`, //路径
+    method: 'post', //提交方式
+    data: sysRole, //其他参数
+  })
+}
