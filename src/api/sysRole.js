@@ -15,7 +15,7 @@ export const GetSysRoleListByPage = (current, limit, queryDto) => {
 }
 
 //角色添加
-export const SaveSysRole = sysRole => {
+export const SaveSysRole = (sysRole) => {
   return request({
     //``模板字符串
     url: `${base_api}/saveSysRole`, //路径
@@ -25,11 +25,20 @@ export const SaveSysRole = sysRole => {
 }
 
 //角色修改
-export const UpdateSysRole = sysRole => {
+export const UpdateSysRole = (sysRole) => {
   return request({
     //``模板字符串
     url: `${base_api}/updateSysRole`, //路径
     method: 'put', //提交方式
     data: sysRole, //其他参数
+  })
+}
+
+//角色删除
+export const DeleteSysRole = (roleId) => {
+  return request({
+    //``模板字符串
+    url: `${base_api}/deleteById/${roleId}`, //路径
+    method: 'delete', //提交方式
   })
 }
