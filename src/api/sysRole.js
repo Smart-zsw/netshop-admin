@@ -23,3 +23,13 @@ export const SaveSysRole = sysRole => {
     data: sysRole, //其他参数
   })
 }
+
+//角色修改
+export const UpdateSysRole = sysRole => {
+  return request({
+    //``模板字符串
+    url: `${base_api}/updateSysRole`, //路径
+    method: 'put', //提交方式
+    data: sysRole, //其他参数
+  })
+}
