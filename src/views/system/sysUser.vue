@@ -5,12 +5,17 @@
       <el-row>
         <el-col :span="12">
           <el-form-item label="关键字">
-            <el-input style="width: 100%" placeholder="用户名"></el-input>
+            <el-input
+              v-model="queryDto.keyword"
+              style="width: 100%"
+              placeholder="用户名"
+            ></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="创建时间">
             <el-date-picker
+              v-model="createTimes"
               type="daterange"
               range-separator="To"
               start-placeholder="开始时间"
@@ -22,10 +27,10 @@
         </el-col>
       </el-row>
       <el-row style="display:flex">
-        <el-button type="primary" size="small">
+        <el-button type="primary" size="small" @click="searchSysUser">
           搜索
         </el-button>
-        <el-button size="small">重置</el-button>
+        <el-button size="small" @click="resetData">重置</el-button>
       </el-row>
     </el-form>
   </div>
@@ -69,30 +74,60 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import {GetSysUserListByPage, SaveSysUser, UpdateSysUser, DeleteSysUser,} from '@/api/sysUser'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
+/////////////////用户列表
 // 表格数据模型
-const list = ref([
-  {
-    id: 1,
-    userName: 'admin',
-    name: 'admin',
-    phone: '13121034567',
-    status: 1,
-    createTime: '2023-05-11',
-  },
-  {
-    id: 2,
-    userName: 'admin',
-    name: 'admin',
-    phone: '13121034567',
-    status: 1,
-    createTime: '2023-05-11',
-  },
-])
+const list = ref([])
 
 // 分页条数据模型
 const total = ref(0)
+
+//分页
+const pageParamsForm = {
+  page: 1, //当前页
+  limit: 3 //每页记录数
+}
+const pageParams = ref(pageParamsForm)
+
+//封装条件数据模型
+const queryDto = ref({
+  keyword: "",
+  createTimeBegin: "",
+  createTimeEnd: "",
+})
+
+//开始和结束时间数据模型
+const createTimes = ref([])
+
+//钩子函数
+onMounted(() => {
+  fetchData()
+})
+
+//条件分查询方法 axios调用
+const fetchData = async () => {
+  //获取开始和结束时间
+  if (createTimes.value.length == 2) {
+    queryDto.value.createTimeBegin = createTimes.value[0]
+    queryDto.value.createTimeEnd = createTimes.value[1]
+  }
+  const { data } = await GetSysUserListByPage(
+    pageParams.value.page,
+    pageParams.value.limit,
+    queryDto.value
+  )
+  list.value = data.list
+  total.value = data.total
+}
+
+//搜索方法
+const searchSysUser = () => {
+  fetchData()
+}
+
 </script>
 
 <style scoped>
@@ -103,6 +138,7 @@ const total = ref(0)
   border-radius: 3px;
   background-color: #fff;
 }
+
 .tools-div {
   margin: 10px 0;
   padding: 10px;
@@ -110,11 +146,13 @@ const total = ref(0)
   border-radius: 3px;
   background-color: #fff;
 }
+
 .avatar-uploader .avatar {
   width: 178px;
   height: 178px;
   display: block;
 }
+
 .avatar-uploader .el-upload {
   border: 1px dashed var(--el-border-color);
   border-radius: 6px;
@@ -123,9 +161,11 @@ const total = ref(0)
   overflow: hidden;
   transition: var(--el-transition-duration-fast);
 }
+
 .avatar-uploader .el-upload:hover {
   border-color: var(--el-color-primary);
 }
+
 .el-icon.avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
