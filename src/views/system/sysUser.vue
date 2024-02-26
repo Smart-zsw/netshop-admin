@@ -37,8 +37,42 @@
 
   <!--添加按钮-->
   <div class="tools-div">
-    <el-button type="success" size="small">添 加</el-button>
+    <el-button type="success" size="small" @click="addShow">添 加</el-button>
   </div>
+
+  <el-dialog v-model="dialogVisible" title="添加或修改" width="40%">
+    <el-form label-width="120px">
+      <el-form-item label="用户名">
+        <el-input v-model="sysUser.userName" />
+      </el-form-item>
+      <el-form-item v-if="sysUser.id == null" label="密码">
+        <el-input type="password" show-password v-model="sysUser.password" />
+      </el-form-item>
+      <el-form-item label="姓名">
+        <el-input v-model="sysUser.name" />
+      </el-form-item>
+      <el-form-item label="手机">
+        <el-input v-model="sysUser.phone" />
+      </el-form-item>
+      <el-form-item label="头像">
+        <el-upload
+          class="avatar-uploader"
+          action="http://localhost:8501/admin/system/fileUpload"
+          :show-file-list="false"
+        >
+          <img v-if="sysUser.avatar" :src="sysUser.avatar" class="avatar" />
+          <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="描述">
+        <el-input v-model="sysUser.description" />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submit">提交</el-button>
+        <el-button @click="dialogVisible = false">取消</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
 
   <!---数据表格-->
   <el-table :data="list" style="width: 100%">
@@ -87,7 +121,36 @@ import {
 } from '@/api/sysUser'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-/////////////////用户列表
+//用户添加和修改
+const dialogVisible = ref(false)
+
+const form = {
+  userName: '',
+  name: '',
+  phone: '',
+  password: '',
+  description: '',
+  avatar: '',
+}
+const sysUser = ref(form)
+
+//点击添加弹出框
+const addShow = ()=>{
+  sysUser.value = {}
+  dialogVisible.value = true
+}
+
+//提交方法
+const submit = async () => {
+  const {code} = await SaveSysUser(sysUser.value)
+  if (code === 200) {
+    dialogVisible.value = false
+    ElMessage.success("操作成功")
+    fetchData()
+  }
+}
+
+//用户列表
 // 表格数据模型
 const list = ref([])
 
