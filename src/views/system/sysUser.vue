@@ -67,7 +67,11 @@
   </el-table>
 
   <el-pagination
+    v-model:current-page="pageParams.page"
+    v-model:page-size="pageParams.limit"
     :page-sizes="[10, 20, 50, 100]"
+    @size-change="fetchData"
+    @current-change="fetchData"
     layout="total, sizes, prev, pager, next"
     :total="total"
   />
@@ -75,7 +79,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import {GetSysUserListByPage, SaveSysUser, UpdateSysUser, DeleteSysUser,} from '@/api/sysUser'
+import {
+  GetSysUserListByPage,
+  SaveSysUser,
+  UpdateSysUser,
+  DeleteSysUser,
+} from '@/api/sysUser'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 /////////////////用户列表
@@ -88,15 +97,15 @@ const total = ref(0)
 //分页
 const pageParamsForm = {
   page: 1, //当前页
-  limit: 3 //每页记录数
+  limit: 3, //每页记录数
 }
 const pageParams = ref(pageParamsForm)
 
 //封装条件数据模型
 const queryDto = ref({
-  keyword: "",
-  createTimeBegin: "",
-  createTimeEnd: "",
+  keyword: '',
+  createTimeBegin: '',
+  createTimeEnd: '',
 })
 
 //开始和结束时间数据模型
@@ -127,7 +136,6 @@ const fetchData = async () => {
 const searchSysUser = () => {
   fetchData()
 }
-
 </script>
 
 <style scoped>

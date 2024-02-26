@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-
 const base_api = '/admin/system/sysUser'
 
 // 用户列表
