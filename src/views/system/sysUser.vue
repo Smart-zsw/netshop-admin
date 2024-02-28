@@ -87,11 +87,11 @@
       {{ scope.row.status == 1 ? '正常' : '停用' }}
     </el-table-column>
     <el-table-column prop="createTime" label="创建时间" />
-    <el-table-column label="操作" align="center" width="280">
-      <el-button type="primary" size="small">
+    <el-table-column label="操作" align="center" width="280" #default="scope">
+      <el-button type="primary" size="small" @click="editSysUser(scope.row)">
         修改
       </el-button>
-      <el-button type="danger" size="small">
+      <el-button type="danger" size="small" @click="deleteById(scope.row)">
         删除
       </el-button>
       <el-button type="warning" size="small">
@@ -120,6 +120,22 @@ import {
   DeleteSysUser,
 } from '@/api/sysUser'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import edit from '@/views/test/Edit.vue'
+
+//用户删除
+const deleteById = row => {
+  ElMessageBox.confirm('此操作将永久删除该记录，是否继续？', 'Warning', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    const { code } = await DeleteSysUser(row.id)
+    if (code === 200) {
+      ElMessage.success('删除成功')
+      fetchData()
+    }
+  })
+}
 
 //用户添加和修改
 const dialogVisible = ref(false)
@@ -134,19 +150,36 @@ const form = {
 }
 const sysUser = ref(form)
 
+//点击修改按钮弹出框 进行数据回显
+const editSysUser = row => {
+  sysUser.value = { ...row }
+  dialogVisible.value = true
+}
+
 //点击添加弹出框
-const addShow = ()=>{
+const addShow = () => {
   sysUser.value = {}
   dialogVisible.value = true
 }
 
 //提交方法
 const submit = async () => {
-  const {code} = await SaveSysUser(sysUser.value)
-  if (code === 200) {
-    dialogVisible.value = false
-    ElMessage.success("操作成功")
-    fetchData()
+  if (!sysUser.value.id) {
+    //没有id进行添加操作
+    const { code } = await SaveSysUser(sysUser.value)
+    if (code === 200) {
+      dialogVisible.value = false
+      ElMessage.success('操作成功')
+      fetchData()
+    }
+  } else {
+    //修改
+    const { code } = await UpdateSysUser(sysUser.value)
+    if (code === 200) {
+      dialogVisible.value = false
+      ElMessage.success('操作成功')
+      fetchData()
+    }
   }
 }
 
