@@ -15,7 +15,7 @@ export const GetSysRoleListByPage = (current, limit, queryDto) => {
 }
 
 //角色添加
-export const SaveSysRole = (sysRole) => {
+export const SaveSysRole = sysRole => {
   return request({
     //``模板字符串
     url: `${base_api}/saveSysRole`, //路径
@@ -25,7 +25,7 @@ export const SaveSysRole = (sysRole) => {
 }
 
 //角色修改
-export const UpdateSysRole = (sysRole) => {
+export const UpdateSysRole = sysRole => {
   return request({
     //``模板字符串
     url: `${base_api}/updateSysRole`, //路径
@@ -35,10 +35,18 @@ export const UpdateSysRole = (sysRole) => {
 }
 
 //角色删除
-export const DeleteSysRole = (roleId) => {
+export const DeleteSysRole = roleId => {
   return request({
     //``模板字符串
     url: `${base_api}/deleteById/${roleId}`, //路径
     method: 'delete', //提交方式
+  })
+}
+
+// 查询所有的角色数据
+export const GetAllRoleList = () => {
+  return request({
+    url: '/admin/system/sysRole/findAllRoles',
+    method: 'get',
   })
 }
