@@ -144,34 +144,38 @@ import {
   DeleteSysUser,
 } from '@/api/sysUser'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {GetAllRoleList} from '@/api/sysRole'
+import { GetAllRoleList } from '@/api/sysRole'
 
 //为用户分配角色
 // 角色列表
 const userRoleIds = ref([])
 const allRoles = ref([
-  {"id":1 , "roleName":"管理员"},
-  {"id":2 , "roleName":"业务人员"},
-  {"id":3 , "roleName":"商品录入员"},
+  { id: 1, roleName: '管理员' },
+  { id: 2, roleName: '业务人员' },
+  { id: 3, roleName: '商品录入员' },
 ])
 const dialogRoleVisible = ref(false)
 const showAssignRole = async row => {
-  sysUser.value = {...row}
+  sysUser.value = { ...row }
   dialogRoleVisible.value = true
 
-  const {data} = await GetAllRoleList()
+  //得到所有角色
+  const { data } = await GetAllRoleList(row.id)
   allRoles.value = data.allRolesList
+
+  //用户分配过的角色
+  userRoleIds.value = data.sysUserRoles
 }
 
 //分配角色
-const doAssign = async  ()=>{
+const doAssign = async () => {
   let assignRoleVo = {
     userId: sysUser.value.id,
-    roleIdList: userRoleIds.value
+    roleIdList: userRoleIds.value,
   }
-  const {code} = await DoAssignRoleToUser(assignRoleVo)
+  const { code } = await DoAssignRoleToUser(assignRoleVo)
   if (code === 200) {
-    ElMessage.success("操作成功")
+    ElMessage.success('操作成功')
     dialogRoleVisible.value = false
     fetchData()
   }
